@@ -12,6 +12,13 @@ class PaymentTestPage extends Page {
 
 class PaymentTestPage_Controller extends Page_Controller {
 
+  function index() {
+    return array( 
+       'Content' => $this->Content, 
+       'Form' => $this->OrderForm() 
+    );
+  }
+
   /**
    * Get the order form for processing a dummy payment
    */
@@ -54,11 +61,10 @@ class PaymentTestPage_Controller extends Page_Controller {
 
     $result = $paymentController->processRequest($data);
 
-    $customisedController = $this->customise(array(
+    return $this->customise(array(
       "Content" => 'Payment #' . $result->ID . ' status:' . $result->Status,
       "Form" => '',
-    ));
-    return $customisedController->renderWith("Page");
+    ))->renderWith("Page");
   }
 
 }
