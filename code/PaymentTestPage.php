@@ -12,6 +12,8 @@ class PaymentTestPage extends Page {
 
 class PaymentTestPage_Controller extends Page_Controller {
 
+  public static $paymentMethod = "Dummy";
+
   function index() {
     return array( 
        'Content' => $this->Content, 
@@ -32,8 +34,9 @@ class PaymentTestPage_Controller extends Page_Controller {
     //TODO For each payment method that is enabled get the form fields
     //old way was Payment::get_combined_form_fields() - is there a better way now?
     //maybe we can use DI for this also?
+    $paymentController = singleton('Payment_Controller');
 
-    $paymentFields = singleton('Dummy_Payment')->getFormFields();
+    $paymentFields = $paymentController->getFormFields();
     //SS_Log::log(new Exception(print_r($paymentFields->map(), true)), SS_Log::NOTICE);
 
     //TODO should we wrap payment fields in a CompositeField so we can just
@@ -55,16 +58,9 @@ class PaymentTestPage_Controller extends Page_Controller {
    * Process order
    */
   function processOrder($data, $form) {
-
     $paymentMethod = $data['PaymentMethod'];
-    $paymentController = Payment_Factory::createController($paymentMethod);
+    $paymentController = new $paymentMethod();
 
-    $result = $paymentController->processRequest($data);
-
-    return $this->customise(array(
-      "Content" => 'Payment #' . $result->ID . ' status:' . $result->Status,
-      "Form" => '',
-    ))->renderWith("Page");
+    $paymentController->processRequest($data);
   }
-
 }
