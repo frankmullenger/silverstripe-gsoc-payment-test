@@ -29,10 +29,15 @@ class PaymentTestPage_Controller extends Page_Controller {
 
     // Create a dropdown select field for choosing gateway
     $supported_methods = Payment_Controller::get_supported_methods();
+    $source = array();
+    foreach ($supported_methods as $methodName => $controllerClass) {
+      $source[$methodName] = $methodName;
+    }
+
     $fields->push(new DropDownField(
-      'payment_controller', 
+      'PaymentMethod', 
       'Select Payment Method', 
-      $supported_methods
+      $source
     ));
 
     $paymentFields = Payment_Controller::get_combined_form_fields();
@@ -53,8 +58,8 @@ class PaymentTestPage_Controller extends Page_Controller {
    */
   function processOrder($data, $form) {
     $paymentMethod = $data['PaymentMethod'];
-    $paymentController = new $paymentMethod();
+    $paymentController = Payment_Controller::factory($paymentMethod);
 
-    $paymentController->processRequest($data);
+    $paymentController->processRequest($form, $data);
   }
 }
