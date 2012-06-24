@@ -60,7 +60,6 @@ class PaymentTestPage_Controller extends Page_Controller {
   function processOrder($data, $form) {
     $paymentMethod = $data['PaymentMethod'];
     $paymentController = new $paymentMethod();
-
     $paymentController->processRequest($data);
   }
 }
