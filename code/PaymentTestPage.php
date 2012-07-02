@@ -15,6 +15,9 @@ class PaymentTestPage_Controller extends Page_Controller {
   public static $paymentMethod = "Dummy";
 
   function index() {
+
+    SS_Log::log(new Exception(print_r('getting to here', true)), SS_Log::NOTICE);
+
     return array( 
        'Content' => $this->Content, 
        'Form' => $this->OrderForm() 
