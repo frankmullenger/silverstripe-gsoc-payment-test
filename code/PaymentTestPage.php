@@ -11,9 +11,6 @@ class PaymentTestPage extends Page {
 }
 
 class PaymentTestPage_Controller extends Page_Controller {
-
-  public static $paymentMethod = "Dummy";
-
   function index() {
     return array( 
        'Content' => $this->Content, 
@@ -28,10 +25,10 @@ class PaymentTestPage_Controller extends Page_Controller {
     $fields = new FieldList;
 
     // Create a dropdown select field for choosing gateway
-    $supported_methods = Payment_Controller::get_supported_methods();
+    $supported_methods = PaymentProcessor::get_supported_methods();
     $source = array();
     foreach ($supported_methods as $methodName) {
-      $methodConfig = Payment_Controller::get_factory_config($methodName);
+      $methodConfig = PaymentFactory::get_factory_config($methodName);
       $source[$methodName] = $methodConfig['title'];
     }
 
@@ -41,7 +38,7 @@ class PaymentTestPage_Controller extends Page_Controller {
       $source
     ));
 
-    $paymentFields = Payment_Controller::get_combined_form_fields();
+    $paymentFields = PaymentProcessor::get_combined_form_fields();
 
     if ($paymentFields && $paymentFields->exists()) foreach ($paymentFields as $paymentField) {
       $fields->push($paymentField);
@@ -59,7 +56,7 @@ class PaymentTestPage_Controller extends Page_Controller {
    */
   function processOrder($data, $form) {
     $paymentMethod = $data['PaymentMethod'];
-    $paymentController = Payment_Controller::factory($paymentMethod);
-    return $paymentController->processRequest($form, $data);
+    $paymentController = PaymentFactory::factory($paymentMethod);
+    return $paymentController->processRequest($data);
   }
 }
