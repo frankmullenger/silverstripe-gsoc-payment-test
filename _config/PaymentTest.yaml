@@ -1,7 +1,7 @@
 name: PaymentTest
 ---
 
-Payment_Controller:
+PaymentProcessor:
   supported_methods:
     - 'DummyMerchantHosted'
     - 'DummyGatewayHosted'
