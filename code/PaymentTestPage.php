@@ -32,6 +32,7 @@ class PaymentTestPage_Controller extends Page_Controller {
 
     // Create a dropdown select field for choosing gateway
     $supported_methods = Payment_Controller::get_supported_methods();
+    
     $source = array();
     foreach ($supported_methods as $methodName) {
       $methodConfig = Payment_Controller::get_factory_config($methodName);
