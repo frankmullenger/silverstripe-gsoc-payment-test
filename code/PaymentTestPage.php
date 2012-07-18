@@ -52,11 +52,9 @@ class PaymentTestPage_Controller extends Page_Controller {
   
   function OrderForm() {
     $paymentMethod = Session::get('PaymentMethod');
-    Session::destroy();
     $processor = PaymentFactory::factory($paymentMethod);
-    
     $fields = $processor->getFormFields();
-    $fields->push(new HiddenField('PaymentMethod', 'PaymentMethod', $paymentMethod));
+    $fields->push(new HiddenField('PaymentMethod', 'PaymentMethod', 'PayPalDirect'));
     
     $actions = new FieldList(
       new FormAction('processOrder', 'Process Order')  
@@ -65,7 +63,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     return $this->customise(array(
       'Content' => $this->Content,
       'Form' => new Form($this, 'OrderForm', $fields, $actions)
-    ))->renderWith('Page'); 
+    ))->renderWith('Page');
   }
   
   /**
@@ -73,6 +71,7 @@ class PaymentTestPage_Controller extends Page_Controller {
    */
   function processOrder($data, $form) {
     $paymentMethod = $data['PaymentMethod'];
+    print $paymentMethod;
     $paymentController = PaymentFactory::factory($paymentMethod);
     return $paymentController->processRequest($data);
   }
