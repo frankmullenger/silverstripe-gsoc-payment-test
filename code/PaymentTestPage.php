@@ -14,14 +14,14 @@ class PaymentTestPage_Controller extends Page_Controller {
   function index() {
     return array( 
        'Content' => $this->Content, 
-       'Form' => $this->OrderForm() 
+       'Form' => $this->ProcessForm() 
     );
   }
 
   /**
    * Get the order form for processing a dummy payment
    */
-  function OrderForm() {
+  function ProcessForm() {
     $fields = new FieldList;
 
     // Create a dropdown select field for choosing gateway
@@ -38,15 +38,31 @@ class PaymentTestPage_Controller extends Page_Controller {
       $source
     ));
 
-    $paymentFields = PaymentProcessor::get_combined_form_fields();
-
-    if ($paymentFields && $paymentFields->exists()) foreach ($paymentFields as $paymentField) {
-      $fields->push($paymentField);
-    }
-
     $actions = new FieldList(
-      new FormAction('processOrder', 'Place order')
+      new FormAction('proceed', 'Proceed')
     );
+    
+    return new Form($this, 'ProcessForm', $fields, $actions);
+  }
+  
+  function proceed($data, $form) {
+    Session::set('PaymentMethod', $data['PaymentMethod']);
+    
+    return $this->customise(array(
+      'Content' => $this->Content,
+      'Form' => $this->OrderForm()
+    ))->renderWith('Page');
+  }
+  
+  function OrderForm() {
+    $paymentMethod = Session::get('PaymentMethod');
+    $processor = PaymentFactory::factory($paymentMethod);
+    $fields = $processor->getFormFields();
+    $fields->push(new HiddenField('PaymentMethod', 'PaymentMethod', $paymentMethod));
+    
+    $actions = new FieldList(
+      new FormAction('processOrder', 'Process Order')  
+    ); 
     
     return new Form($this, 'OrderForm', $fields, $actions);
   }
@@ -59,6 +75,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     SS_Log::log(new Exception(print_r($data, true)), SS_Log::NOTICE);
 
     $paymentMethod = $data['PaymentMethod'];
+    print $paymentMethod;
     $paymentController = PaymentFactory::factory($paymentMethod);
 
     SS_Log::log(new Exception(print_r($paymentController, true)), SS_Log::NOTICE);
