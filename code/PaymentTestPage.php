@@ -12,9 +12,6 @@ class PaymentTestPage extends Page {
 
 class PaymentTestPage_Controller extends Page_Controller {
   function index() {
-
-    SS_Log::log(new Exception(print_r('getting to here', true)), SS_Log::NOTICE);
-
     return array( 
        'Content' => $this->Content, 
        'Form' => $this->OrderForm() 
@@ -58,8 +55,14 @@ class PaymentTestPage_Controller extends Page_Controller {
    * Process order
    */
   function processOrder($data, $form) {
+
+    SS_Log::log(new Exception(print_r($data, true)), SS_Log::NOTICE);
+
     $paymentMethod = $data['PaymentMethod'];
     $paymentController = PaymentFactory::factory($paymentMethod);
+
+    SS_Log::log(new Exception(print_r($paymentController, true)), SS_Log::NOTICE);
+
     return $paymentController->processRequest($data);
   }
 }
