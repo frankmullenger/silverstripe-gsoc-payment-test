@@ -56,7 +56,14 @@ class PaymentTestPage_Controller extends Page_Controller {
   
   function OrderForm() {
     $paymentMethod = Session::get('PaymentMethod');
-    $processor = PaymentFactory::factory($paymentMethod);
+    
+    try {
+      $processor = PaymentFactory::factory($paymentMethod);
+    } catch (Exception $e) {
+      $fields = new FieldList(array(new ReadonlyField($e->getMessage())));
+      return new Form($this, 'OrderForm', $fields);
+    }
+    
     $fields = $processor->getFormFields();
     $fields->push(new HiddenField('PaymentMethod', 'PaymentMethod', $paymentMethod));
     
@@ -64,7 +71,9 @@ class PaymentTestPage_Controller extends Page_Controller {
       new FormAction('processOrder', 'Process Order')  
     ); 
     
-    return new Form($this, 'OrderForm', $fields, $actions);
+    $validator = $processor->getFormRequirements();
+    
+    return new Form($this, 'OrderForm', $fields, $actions, $validator);
   }
   
   /**
@@ -72,8 +81,34 @@ class PaymentTestPage_Controller extends Page_Controller {
    */
   function processOrder($data, $form) {
     $paymentMethod = $data['PaymentMethod'];
-    print $paymentMethod;
-    $paymentController = PaymentFactory::factory($paymentMethod);
-    return $paymentController->processRequest($data);
+    
+    try {
+      $paymentController = PaymentFactory::factory($paymentMethod);
+    } catch (Exception $e) {
+      return $this->customise(array(
+        'Content' => $e->getMessage()  
+      ))->renderWith('Page');  
+    }
+    
+    try {
+      $paymentController->setRedirectURL($this->link() . 'complete');
+      $paymentController->processRequest($data);
+    } catch (ValidationException $e) {
+      return $this->customise(array(
+        'Content' => $e->getMessage()
+      ))->renderWith('Page');
+    }
+  }
+  
+  /**
+   * Show a page after a payment is completed 
+   */
+  function complete() {
+    $paymentID = Session::get('PaymentID');
+    $payment = Payment::get()->byID($paymentID);
+    
+    return $this->customise(array(
+      'Content' => 'Payement completed. Status: ' . $payment->Status   
+    ))->renderWith('Page');
   }
 }
