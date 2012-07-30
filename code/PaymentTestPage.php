@@ -62,9 +62,14 @@ class PaymentTestPage_Controller extends Page_Controller {
     
     $actions = new FieldList(
       new FormAction('processOrder', 'Process Order')  
-    ); 
+    );
+
+    //$validator = $processor->getFormRequirements(); 
+    //$validator = new RequiredFields('Amount', 'Currency');
+
+    $validator = new RequiredFields();
     
-    return new Form($this, 'OrderForm', $fields, $actions);
+    return new Form($this, 'OrderForm', $fields, $actions, $validator);
   }
   
   /**
