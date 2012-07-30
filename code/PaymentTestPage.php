@@ -61,7 +61,8 @@ class PaymentTestPage_Controller extends Page_Controller {
       $processor = PaymentFactory::factory($paymentMethod);
     } catch (Exception $e) {
       $fields = new FieldList(array(new ReadonlyField($e->getMessage())));
-      return new Form($this, 'OrderForm', $fields);
+      $actions = new FieldList();
+      return new Form($this, 'OrderForm', $fields, $actions);
     }
     
     $fields = $processor->getFormFields();
@@ -93,7 +94,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     try {
       $paymentController->setRedirectURL($this->link() . 'complete');
       $paymentController->processRequest($data);
-    } catch (ValidationException $e) {
+    } catch (Exception $e) {
       return $this->customise(array(
         'Content' => $e->getMessage()
       ))->renderWith('Page');
