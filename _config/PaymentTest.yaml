@@ -1,7 +1,0 @@
-name: PaymentTest
----
-
-PaymentProcessor:
-  supported_methods:
-    - 'DummyMerchantHosted'
-    - 'DummyGatewayHosted'
