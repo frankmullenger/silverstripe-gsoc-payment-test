@@ -12,11 +12,10 @@ Requirements
 
 Documentation
 -------------
-Paystation integration for payment module
 
 Installation Instructions
 -------------------------
-1. Place this directory in the root of your SilverStripe installation and call it 'payment-paystation'.
+1. Place this directory in the root of your SilverStripe installation and call it 'payment-test'.
 2. Visit yoursite.com/dev/build to rebuild the database.
 3. Enable supported payment methods in your application yaml file
 

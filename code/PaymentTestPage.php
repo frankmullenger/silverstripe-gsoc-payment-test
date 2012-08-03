@@ -85,16 +85,19 @@ class PaymentTestPage_Controller extends Page_Controller {
     $paymentMethod = $data['PaymentMethod'];
     
     try {
-      $paymentController = PaymentFactory::factory($paymentMethod);
+      $paymentProcessor = PaymentFactory::factory($paymentMethod);
     } catch (Exception $e) {
       return $this->customise(array(
         'Content' => $e->getMessage()  
       ))->renderWith('Page');  
     }
+
+    SS_Log::log(new Exception(print_r($data, true)), SS_Log::NOTICE);
     
     try {
-      $paymentController->setRedirectURL($this->link() . 'complete');
-      $paymentController->processRequest($data);
+      $paymentProcessor->setRedirectURL($this->link() . 'complete');
+      
+      $paymentProcessor->processRequest($data);
     } catch (Exception $e) {
       return $this->customise(array(
         'Content' => $e->getMessage()
