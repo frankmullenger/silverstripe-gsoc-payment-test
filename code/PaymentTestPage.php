@@ -11,6 +11,7 @@ class PaymentTestPage extends Page {
 }
 
 class PaymentTestPage_Controller extends Page_Controller {
+
   function index() {
     return array( 
        'Content' => $this->Content, 
@@ -48,11 +49,11 @@ class PaymentTestPage_Controller extends Page_Controller {
   
   function proceed($data, $form) {
     Session::set('PaymentMethod', $data['PaymentMethod']);
-    
-    return $this->customise(array(
+
+    return array(
       'Content' => $this->Content,
       'Form' => $this->OrderForm()
-    ))->renderWith('Page');
+    );
   }
   
   function OrderForm() {
@@ -88,28 +89,28 @@ class PaymentTestPage_Controller extends Page_Controller {
       $paymentProcessor = PaymentFactory::factory($paymentMethod);
     } 
     catch (Exception $e) {
-      return $this->customise(array(
-        'Content' => $e->getMessage()  
-      ))->renderWith('Page');  
+      return array(
+        'Content' => $e->getMessage() 
+      );
     }
 
     try {
 
       $paymentProcessor->setRedirectURL($this->link() . 'completed');
-      
       $paymentProcessor->capture($data);
-
     } 
     catch (Exception $e) {
 
       $result = $paymentProcessor->gateway->getValidationResult();
+      $payment = $paymentProcessor->payment;
 
-      $content = 'Payment Failed: ' . $e->getMessage() . ' ' . $result->message();
-      $content .= ' Payment Status: ' . $paymentProcessor->payment->Status;
-
-      return $this->customise(array(
-        'Content' => $content
-      ))->renderWith('Page');
+      return array(
+        'Content' => $this->customise(array(
+          'ExceptionMessage' => $e->getMessage(),
+          'ValidationMessage' => $result->message(),
+          'Payment' => $payment
+        ))->renderWith('PaymentTestPage')
+      );
     }
   }
   
@@ -120,10 +121,12 @@ class PaymentTestPage_Controller extends Page_Controller {
 
     $paymentID = Session::get('PaymentID');
     $payment = Payment::get()->byID($paymentID);
-    
-    return $this->customise(array(
-      'Content' => 'Payement completed. Status: ' . $payment->Status . ', Payment ID: ' . $payment->ID
-    ))->renderWith('Page');
+
+    return array(
+      'Content' => $this->customise(array(
+        'Payment' => $payment
+      ))->renderWith('PaymentTestPage')
+    );
   }
 }
 
