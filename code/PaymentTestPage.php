@@ -86,21 +86,29 @@ class PaymentTestPage_Controller extends Page_Controller {
     
     try {
       $paymentProcessor = PaymentFactory::factory($paymentMethod);
-    } catch (Exception $e) {
+    } 
+    catch (Exception $e) {
       return $this->customise(array(
         'Content' => $e->getMessage()  
       ))->renderWith('Page');  
     }
 
-    SS_Log::log(new Exception(print_r($data, true)), SS_Log::NOTICE);
-    
     try {
-      $paymentProcessor->setRedirectURL($this->link() . 'complete');
+
+      $paymentProcessor->setRedirectURL($this->link() . 'completed');
       
-      $paymentProcessor->processRequest($data);
-    } catch (Exception $e) {
+      $paymentProcessor->capture($data);
+
+    } 
+    catch (Exception $e) {
+
+      $result = $paymentProcessor->gateway->getValidationResult();
+
+      $content = 'Payment Failed: ' . $e->getMessage() . ' ' . $result->message();
+      $content .= ' Payment Status: ' . $paymentProcessor->payment->Status;
+
       return $this->customise(array(
-        'Content' => $e->getMessage()
+        'Content' => $content
       ))->renderWith('Page');
     }
   }
@@ -108,12 +116,13 @@ class PaymentTestPage_Controller extends Page_Controller {
   /**
    * Show a page after a payment is completed 
    */
-  function complete() {
+  function completed() {
+
     $paymentID = Session::get('PaymentID');
     $payment = Payment::get()->byID($paymentID);
     
     return $this->customise(array(
-      'Content' => 'Payement completed. Status: ' . $payment->Status   
+      'Content' => 'Payement completed. Status: ' . $payment->Status . ', Payment ID: ' . $payment->ID
     ))->renderWith('Page');
   }
 }
