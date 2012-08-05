@@ -1,9 +1,11 @@
 <% if ExceptionMessage %>
-  <p>$ExceptionMessage</p>
-<% end_if %>
-
-<% if ValidationMessage %>
-  <p>$ValidationMessage</p>
+  <p>
+    <strong>Error:</strong> $ExceptionMessage <br />
+    <% if ValidationMessage %>
+      <strong>Validation Error:</strong> $ValidationMessage
+    <% end_if %>
+  </p>
+  $OrderForm
 <% end_if %>
 
 <% control Payment %>

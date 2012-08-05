@@ -44,11 +44,14 @@ class PaymentTestPage_Controller extends Page_Controller {
       new FormAction('proceed', 'Proceed')
     );
     
-    return new Form($this, 'ProcessForm', $fields, $actions);
+    $processForm = new Form($this, 'ProcessForm', $fields, $actions);
+    $processForm->disableSecurityToken();
+    return $processForm;
   }
   
   function proceed($data, $form) {
-    Session::set('PaymentMethod', $data['PaymentMethod']);
+
+    if (isset($data['PaymentMethod'])) Session::set('PaymentMethod', $data['PaymentMethod']);
 
     return array(
       'Content' => $this->Content,
@@ -57,11 +60,13 @@ class PaymentTestPage_Controller extends Page_Controller {
   }
   
   function OrderForm() {
+
     $paymentMethod = Session::get('PaymentMethod');
-    
+
     try {
       $processor = PaymentFactory::factory($paymentMethod);
-    } catch (Exception $e) {
+    } 
+    catch (Exception $e) {
       $fields = new FieldList(array(new ReadonlyField($e->getMessage())));
       $actions = new FieldList();
       return new Form($this, 'OrderForm', $fields, $actions);
@@ -73,9 +78,9 @@ class PaymentTestPage_Controller extends Page_Controller {
     $actions = new FieldList(
       new FormAction('processOrder', 'Process Order')  
     ); 
-    
+
     $validator = $processor->getFormRequirements();
-    
+
     return new Form($this, 'OrderForm', $fields, $actions, $validator);
   }
   
@@ -101,6 +106,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     } 
     catch (Exception $e) {
 
+      //This is where we catch gateway validation or gateway unreachable errors
       $result = $paymentProcessor->gateway->getValidationResult();
       $payment = $paymentProcessor->payment;
 
@@ -108,6 +114,7 @@ class PaymentTestPage_Controller extends Page_Controller {
         'Content' => $this->customise(array(
           'ExceptionMessage' => $e->getMessage(),
           'ValidationMessage' => $result->message(),
+          'OrderForm' => $this->OrderForm(),
           'Payment' => $payment
         ))->renderWith('PaymentTestPage')
       );
