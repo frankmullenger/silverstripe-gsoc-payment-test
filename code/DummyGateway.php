@@ -80,7 +80,6 @@ class DummyGateway_GatewayHosted extends PaymentGateway_GatewayHosted {
 	);
 
 	public function __construct() {
-		parent::__construct();
 		$this->gatewayURL = Director::baseURL() . 'dummy/external/pay';
 	}
 
