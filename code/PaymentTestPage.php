@@ -11,6 +11,7 @@ class PaymentTestPage extends Page {
 }
 
 class PaymentTestPage_Controller extends Page_Controller {
+	
   function index() {
     return array( 
        'Content' => $this->Content, 
@@ -94,7 +95,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     
     try {
       $paymentController->setRedirectURL($this->link() . 'complete');
-      $paymentController->processRequest($data);
+      $paymentController->capture($data);
     } catch (Exception $e) {
       return $this->customise(array(
         'Content' => $e->getMessage()
