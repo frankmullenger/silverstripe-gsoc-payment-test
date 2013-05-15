@@ -131,10 +131,8 @@ class DummyGateway_GatewayHosted extends PaymentGateway_GatewayHosted {
 	 * @see PaymentGateway_GatewayHosted::response()
 	 */
 	public function getResponse($request) {
+
 		switch($request->getVar('Status')) {
-			case 'Success':
-				return new PaymentGateway_Success;
-				break;
 			case 'Failure':
 				return new PaymentGateway_Failure(
 					null,
@@ -147,6 +145,7 @@ class DummyGateway_GatewayHosted extends PaymentGateway_GatewayHosted {
 					array($request->getVar('ErrorCode') => $request->getVar('ErrorMessage'))
 				);
 				break;
+			case 'Success':
 			default:
 				return new PaymentGateway_Success();
 				break;
