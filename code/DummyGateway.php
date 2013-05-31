@@ -130,7 +130,7 @@ class DummyGateway_GatewayHosted extends PaymentGateway_GatewayHosted {
 	/**
 	 * @see PaymentGateway_GatewayHosted::response()
 	 */
-	public function getResponse($request) {
+	public function check($request) {
 
 		switch($request->getVar('Status')) {
 			case 'Failure':

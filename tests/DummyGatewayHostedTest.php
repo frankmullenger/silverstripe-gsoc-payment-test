@@ -4,7 +4,6 @@ class DummyGatewayHostedTest extends FunctionalTest {
 
 	public $data;
 	public $processor;
-	public $returnURL;
 
 	public function setUp() {
 		parent::setUp();
@@ -50,13 +49,13 @@ class DummyGatewayHostedTest extends FunctionalTest {
 		$queryString = http_build_query(array(
 			'Amount' => $this->data['Amount'],
 			'Currency' => $this->data['Currency'],
-			'ReturnURL' => $this->processor->gateway->getReturnURL()
+			'ReturnURL' => $this->processor->gateway->returnURL
 		));
 		$this->assertEquals($response->getHeader('Location'), '/dummy/external/pay?' . $queryString);
 		
 		//Test payment completion after redirect from gateway
 		$queryString = http_build_query(array('Status' => 'Success'));
-		Director::test($this->processor->gateway->getReturnURL() . "?$queryString");
+		Director::test($this->processor->gateway->returnURL . "?$queryString");
 		
 		$payment = $payment = Payment::get()->byID($this->processor->payment->ID);
 		$this->assertEquals($payment->Status, Payment::SUCCESS);
@@ -73,7 +72,7 @@ class DummyGatewayHostedTest extends FunctionalTest {
 		$queryString = http_build_query(array(
 			'Amount' => $this->data['Amount'],
 			'Currency' => $this->data['Currency'],
-			'ReturnURL' => $this->processor->gateway->getReturnURL()
+			'ReturnURL' => $this->processor->gateway->returnURL
 		));
 		$this->assertEquals($response->getHeader('Location'), '/dummy/external/pay?' . $queryString);
 
@@ -83,7 +82,7 @@ class DummyGatewayHostedTest extends FunctionalTest {
 			'ErrorMessage' => 'Payment Gateway API Error',
 			'ErrorCode' => '12345'
 		));
-		Director::test($this->processor->gateway->getReturnURL() . "?$queryString");
+		Director::test($this->processor->gateway->returnURL . "?$queryString");
 
 		$payment = $payment = Payment::get()->byID($this->processor->payment->ID);
 		$this->assertEquals($payment->Status, Payment::FAILURE);
@@ -104,7 +103,7 @@ class DummyGatewayHostedTest extends FunctionalTest {
 		$queryString = http_build_query(array(
 			'Amount' => $this->data['Amount'],
 			'Currency' => $this->data['Currency'],
-			'ReturnURL' => $this->processor->gateway->getReturnURL()
+			'ReturnURL' => $this->processor->gateway->returnURL
 		));
 		$this->assertEquals($response->getHeader('Location'), '/dummy/external/pay?' . $queryString);
 		
@@ -114,7 +113,7 @@ class DummyGatewayHostedTest extends FunctionalTest {
 			'ErrorMessage' => 'Awaiting Payment Confirmation',
 			'ErrorCode' => '54321'
 		));
-		Director::test($this->processor->gateway->getReturnURL() . "?$queryString");
+		Director::test($this->processor->gateway->returnURL . "?$queryString");
 
 		$payment = $payment = Payment::get()->byID($this->processor->payment->ID);
 		$this->assertEquals($payment->Status, Payment::INCOMPLETE);

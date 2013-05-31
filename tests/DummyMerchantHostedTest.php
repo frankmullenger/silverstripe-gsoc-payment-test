@@ -52,13 +52,21 @@ class DummyMerchantHostedTest extends SapphireTest {
 	public function testPaymentFailure() {
 		$this->data['Amount'] = '10.02';
 		$this->processor->capture($this->data);
+		
 		$this->assertEquals($this->processor->payment->Status, Payment::FAILURE);
-		$this->assertEquals($this->processor->payment->ErrorMessage, "Payment cannot be completed");
+
+		$error = $this->processor->payment->Errors()->first();
+		$this->assertEquals($error->ErrorMessage, 'Payment cannot be completed');
+		$this->assertEquals($error->ErrorCode, '1A');
 	}
 
 	public function testPaymentIncomplete() {
 		$this->data['Amount'] = '10.03';
 		$this->processor->capture($this->data);
 		$this->assertEquals($this->processor->payment->Status, Payment::INCOMPLETE);
+		
+		$error = $this->processor->payment->Errors()->first();
+		$this->assertEquals($error->ErrorMessage, 'Awaiting payment confirmation');
+		$this->assertEquals($error->ErrorCode, '1B');
 	}
 }
