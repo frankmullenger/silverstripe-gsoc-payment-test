@@ -27,8 +27,16 @@
         <td>$Method</td>
         <td>$Status</td>
         <td>$Amount.Nice</td>
-        <td>$ErrorCodes</td>
-        <td>$Message</td>
+        <td>
+        	<% loop Errors %>
+        		$ErrorCode 
+        	<% end_loop %>
+        </td>
+        <td>
+        	<% loop Errors %>
+        		$ErrorMessage 
+        	<% end_loop %>
+        </td>
         <td>$HTTPStatus</td>
       </tr>
     </tbody>

@@ -73,7 +73,7 @@ class PaymentTestPage_Controller extends Page_Controller {
     }
     
     $fields = $processor->getFormFields();
-    $fields->push(new HiddenField('PaymentMethod', 'PaymentMethod', $paymentMethod));
+    $fields->push(new TextField('PaymentMethod', 'PaymentMethod', $paymentMethod));
     
     $actions = new FieldList(
       new FormAction('processOrder', 'Process Order')  
